@@ -1,0 +1,20 @@
+{% load i18n %}
+{% load countries %}
+
+{% get_current_country as country %}
+{% get_available_countries as COUNTRIES %}
+
+{% get_country_info_list for COUNTRIES as countries %}
+<form action="/country/setcountry/" method="post" name="countries"> 
+  {% csrf_token %}
+  <select name="country">
+  {% for c in countries %}
+  {% ifequal c.code country %}
+  <option selected="true" value="{{ c.code }}">{{ c.name }}</option>
+  {% else %}
+  <option value="{{ c.code }}">{{ c.name }}</option>
+  {% endifequal %}
+  {% endfor %}
+  </select>
+  <input type="submit" value={% trans "Change" %}>
+</form> 

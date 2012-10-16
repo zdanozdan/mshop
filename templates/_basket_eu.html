@@ -1,0 +1,111 @@
+{% load i18n %}
+{% load countries %}
+
+{% load currencies %}
+{% get_current_currency as currency %}
+
+<div id="cart_object">
+
+  <h1>{% trans "Your shopping cart" %}</h1>
+
+  {% if messages %}
+  <ul class="messages messagelist">
+    {% for message in messages %}
+    {% if message.extra_tags == "basket_only" %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endif %}
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  {% if cart_items %}
+  <form action="{% url mikran_eu_cart_update %}" method="post">
+    {% csrf_token %}
+    {% for field in cart_form %}
+    <div class="fieldWrapper">
+      {{ field.errors }}
+      {{ field.label_tag }}: {{ field }}
+    </div>
+    <input type="hidden" name="next" value="{{request.path}}">
+    <input type="hidden" type="submit">
+    {% endfor %}
+  </form>
+
+  <form id="inline_submit" action="{% url mikran_cart_update %}" method="post">
+    {% csrf_token %}
+    {{ formset.management_form }}
+    {% for form in formset %}
+    {{ form.id }}
+    {% endfor %}
+    <table border="1">
+      <thead>
+	<tr>
+          <th>{% trans "Product name" %}</th>
+          <th>{% trans "Netto" %}</th>
+          <th>{% trans "VAT" %}</th>
+          <th>{% trans "Cena brutto" %}</th>
+          <th>{% trans "Quantity" %}</th>
+          <th>{% trans "Wartość Brutto" %}</th>
+          <th>&nbsp;</th>
+	</tr>
+      </thead>
+
+      <tbody>
+	{% for form in formset %}
+	{% with form.quantity as field %}
+	<tr>
+          <td>{{ form.instance.product.name_pl }}                 INS: {{ form.instance.id }}</td>
+          <td>{{ form.instance.product.get_price }}</td>
+          {% for extra_price_field in form.instance.extra_price_fields %}
+	  <td>{{ extra_price_field.0 }}</td>
+	  <td>{{ extra_price_field.2 }}</td>
+	  {% endfor %}
+          <td>
+	    <ul class="inline">
+	      <li>
+		{{ field.errors }}
+		{{ field }} 
+	      </li>
+	      <li>
+		<p><input type="submit" value="{% trans "Change" %}"/></p>
+	      </li>
+	    </ul>
+	  </td>
+          {% for extra_price_field in form.instance.extra_price_fields %}
+          <td>{{ extra_price_field.1 }}</td>
+          <td><a rel="get" rev="cart_object" href="{%url mikran_cart_item_delete form.instance.id %}"> {% trans "Delete" %}</a></td>
+	  {% endfor %}
+          {% endwith %}
+          {% endfor %}
+      </tbody>
+      
+      <tfoot>
+	{% get_current_currency_name as cname %}
+	<tr><td colspan="4">&nbsp;</td><td>{% trans "Cart Subtotal" %} ({% trans cname %})</td><td>{{cart.subtotal_price}} {{currency}}</td></tr>
+	{% for extra_price_field in cart.extra_price_fields %}
+	<tr>
+          <td colspan="2">&nbsp;</td>
+          <td>{{ extra_price_field.0 }}1</td>
+          <td>{{ extra_price_field.1 }}2</td>
+	</tr>
+	{% endfor %}
+	<tr><td colspan="4">&nbsp;</td><td><b>{% trans "Cart Total" %} ({% trans cname %})</b></td><td><b>{{cart.total_price}} {{currency}}</b></td></tr>
+      </tfoot>
+    </table>
+    
+    <!--
+    <p><input type="submit" value="{% trans "Update Shopping Cart" %}"/></p>
+    -->
+  </form>
+
+  <p>
+    <a href="{% url checkout_selection %}">{% trans "Proceed to checkout" %}</a>
+  </p>
+
+  {% else %}
+  <p>
+    {% trans "Shopping cart is empty" %}
+  </p>
+  {% endif %}
+
+</div>

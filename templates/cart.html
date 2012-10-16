@@ -1,0 +1,150 @@
+{% load i18n %}
+{% load countries %}
+{% load currencies %}
+{% load staticfiles %}
+
+{% get_current_country as country %}
+{% get_current_currency as currency %}
+
+<table id="cart_object" class="center" border="1">
+<tr>
+<td>
+  <h1>{% trans "Your shopping cart" %}</h1>
+  {% if messages %}
+  <ul class="messages messagelist">
+    {% for message in messages %}
+    {% if message.extra_tags == "basket_only" %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endif %}
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  {% if cart_items %}
+  {% if country|is_eu_country %}
+  <form action="{% url mikran_eu_cart_update %}" method="post">
+    {% csrf_token %}
+    {% for field in cart_form %}
+    <div class="fieldWrapper">
+      {{ field.errors }}
+      {{ field.label_tag }}: {{ field }}
+    </div>
+    <input type="hidden" name="next" value="{{request.path}}">
+    <input type="hidden" type="submit">
+    {% endfor %}
+  </form>
+  {% endif %}
+  
+  <form id="inline_submit" action="{% url mikran_cart_update %}" method="post">
+    {% csrf_token %}
+    {{ formset.management_form }}
+    {% for form in formset %}
+    {{ form.id }}
+    {% endfor %}
+    <table border="1" class="full">
+      <thead>	
+	<tr>
+	  <td id="progress"><a href="#" id="collapse"><img src="{%static "expand.ico" %}">{%trans "expand/collapse" %}</a></td>
+	  <td colspan="10">
+	    <a href="{% url checkout_selection %}">{% trans "Proceed to checkout" %}</a>
+	  </td>
+	</tr>
+        <tr id="collapse">
+	  {% if country|is_eu_country %}
+          <th>{% trans "Product name" %}</th>
+          <th>{% trans "Netto" %}</th>
+          <th>{% trans "VAT" %}</th>
+          <th>{% trans "Cena brutto" %}</th>
+          <th>{% trans "Quantity" %}</th>
+          <th>{% trans "Wartość Brutto" %}</th>
+          <th>&nbsp;</th>
+	  {% else %}
+          <th>{% trans "Product name" %}</th>
+          <th>{% trans "Price" %}</th>
+          <th>{% trans "Quantity" %}</th>
+          <th>{% trans "Wartość Brutto" %}</th>
+          <th>&nbsp;</th>
+	  {% endif %}
+        </tr>
+      </thead>
+      
+      <tbody id="collapse">
+            {% for form in formset %}
+            {% with form.quantity as field %}
+            <tr>
+              <td>{{ form.instance.product.name_pl }}</td>
+              <td>{{ form.instance.product.get_price }}</td>
+	      {% if country|is_eu_country %}
+              {% for extra_price_field in form.instance.extra_price_fields %}
+	      <td>{{ extra_price_field.0 }}</td>
+	      <td>{{ extra_price_field.2 }}</td>
+	      {% endfor %}
+	      {% endif %}
+              <td>
+		<ul class="inline">
+		  <li>
+		    {{ field.errors }}
+		    {{ field }} 
+		  </li>
+		  <li>
+		    <p>
+		      <input type="submit" value="{% trans "Change" %}"/>
+		      <input type="hidden" name="next" value="{{request.path}}">
+		    </p>
+		  </li>
+		</ul>
+	      </td>
+	      {% if country|is_eu_country %}
+              {% for extra_price_field in form.instance.extra_price_fields %}
+              <td>{{ extra_price_field.1 }}</td>
+              <td><a rel="get" rev="cart_object" href="{%url mikran_cart_item_delete form.instance.id %}"> {% trans "Delete" %}</a></td>
+	      {% endfor %}
+	      {% else %}
+              <td>{{ form.instance.line_subtotal }}</td>
+              <td><a rel="get" rev="cart_object" href="{%url mikran_cart_item_delete form.instance.id %}"> {% trans "Delete" %}</a></td>
+	      {% endif %}
+              {% endwith %}
+              {% endfor %}
+      </tbody>
+      <tfoot>
+	{% get_current_currency_name as cname %}
+	<!--
+        <tr>
+	  {% if country|is_eu_country %}
+	  <td colspan="4">&nbsp;</td>
+	  {% else %}
+	  <td colspan="2">&nbsp;</td>
+	  {% endif %}
+	  <td>{% trans "Cart Subtotal" %} ({% trans cname %}) </td>
+	  <td>{{cart.subtotal_price}} {{currency}}</td>
+	  <td colspan="4">&nbsp</td>
+	</tr>
+	-->
+        {% for extra_price_field in cart.extra_price_fields %}
+        <tr>
+          <td colspan="2">&nbsp;</td>
+          <td>{{ extra_price_field.0 }}</td>
+          <td>{{ extra_price_field.1 }}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+	  {% if country|is_eu_country %}
+	  <td colspan="4">&nbsp;</td>
+	  {% else %}
+	  <td colspan="2">&nbsp;</td>
+	  {% endif %}
+	  <td><b>{% trans "Cart Total" %} ({% trans cname %}) </b></td>
+	  <td><b>{{cart.total_price}} {{currency}}</b></td>
+	  <td colspan="4">&nbsp</td></tr>
+      </tfoot>
+    </table>
+  </form>
+
+  {% else %}
+  <p>
+    {% trans "Shopping cart is empty" %}
+  </p>
+  {% endif %}
+</td>
+</tr>
+</table>

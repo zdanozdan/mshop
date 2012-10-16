@@ -1,0 +1,17 @@
+{% load i18n %}
+{% get_current_language as lang %}
+
+<form action="/i18n/setlang/" method="post">
+{% csrf_token %}
+<select name="language">
+{% get_language_info_list for LANGUAGES as languages %}
+{% for language in languages %}
+{% ifequal lang language.code %}}
+<option selected="true" value="{{ language.code }}">{{ language.name_local }} ({{ language.code }})</option>
+{% else %}
+<option value="{{ language.code }}">{{ language.name_local }} ({{ language.code }})</option>
+{% endifequal %}
+{% endfor %}
+</select>
+<input type="submit" value={% trans "Change" %} />
+</form>
