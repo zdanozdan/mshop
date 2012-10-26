@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+{% load staticfiles %}
+
+{%block css %}
+{{ block.super }}
+<link rel="stylesheet" href="{%static "auth.css" %}" />
+{%endblock %}
+
+{% block header %}
+{%include "_langs.html" %}
+{%include "_login.html" %}
+{% endblock %}
+
+{% block footer %}{% endblock %}

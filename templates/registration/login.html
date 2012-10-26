@@ -1,0 +1,46 @@
+{% extends "registration/registration_base.html" %}
+
+{% load i18n %}
+{% load staticfiles %}
+
+{% block content %}
+
+<div class="login">
+  <div id="container">
+    <!-- Header -->
+    <div id="header">
+        <div id="branding">
+          <h1 id="site-name">{% trans "Please enter username/password" %}</h1>
+        </div>
+    </div> 
+
+    <div id="content">        
+      {% if form.errors %}
+      <p class="errornote">{% trans "Your username and password didn't match. Please try again." %}</p>
+      {% endif %}
+      
+      <form method="post" action="{% url django.contrib.auth.views.login %}">{% csrf_token %}
+	<table>
+	  <tr>
+	    <td>{%trans form.username.label_tag %}</td>
+	    <td>{{ form.username }}</td>
+	  </tr>
+	  <tr>
+	    <td>{% trans form.password.label_tag %}</td>
+	    <td>{{ form.password }}</td>
+	    </tr>
+	</table>
+	<p><a href="{% url auth_password_reset %}">{%trans "Forgot" %}</a> {%trans "your password?" %} <a href="{% url registration_register %}">{% trans "Need an account" %}</a>?</p>
+	
+	<hr/>
+	
+	<input type="submit" value="{%trans "login" %}"/>
+	<input type="hidden" name="next" value="{{ next }}" />
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block footer %}{% endblock %}

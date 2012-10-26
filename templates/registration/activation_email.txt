@@ -1,0 +1,6 @@
+{% load i18n %}{% trans "You have just registered an account at mikran.com. Please click the following link to confirm that we have a valid email address we can use in case we need to contact You." %}
+
+http://{{site.domain}}{% url registration_activate activation_key %}
+
+Sincerely,
+mikran.com team

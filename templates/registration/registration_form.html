@@ -1,0 +1,26 @@
+{% extends "registration/registration_base.html" %}
+
+{% load i18n %}
+{% load staticfiles %}
+
+{% block content %}
+<div class="login">
+  <div id="container">
+    <!-- Header -->
+    <div id="header">
+        <div id="branding">
+          <h1 id="site-name">{% trans "Create new account" %}</h1>
+        </div>
+    </div> 
+    <div id="content"> 
+      <table>
+	<form method="post" action=''>{% csrf_token %}
+          {{ form }}
+        <tr><td></td><td><input type="submit" value="{%trans 'Create' %}" /></td>
+	</form>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block footer %}{% endblock %}
