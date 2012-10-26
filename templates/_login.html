@@ -1,0 +1,9 @@
+{% load i18n %}
+
+{% if user.is_authenticated %}
+{{ user.username }}
+<a href="{%url django.contrib.auth.views.logout %}?next={{request.path}}">{%trans "Log out" %}</a>
+{% else %}
+<a href="{%url django.contrib.auth.views.login %}?next={{request.path}}">{%trans "Log in" %}</a>
+<a href="{% url registration_register %}">{% trans "Need an account" %} ? </a>
+{% endif %}
