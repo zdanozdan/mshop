@@ -1,1 +1,1 @@
-from mshop.signals import register_handler
+import mshop.signals
