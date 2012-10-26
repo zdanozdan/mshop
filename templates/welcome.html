@@ -7,22 +7,19 @@
 
 {% block header %}
 
+{%include "_login.html" %}
+
 <img src="{%static "logo.jpg" %}">
-
-{% if user.is_authenticated %}
-Witamy w pracy, {{ user.first_name }}.
-
-Wyloguj się
-{% else %}
-Zaloguj się
-{% endif %}
 
 {%include "_currencies.html" %}
 {%include "_countries.html" %}
 {%include "_langs.html" %}
 
-{%include "cart.html" %}
+{% endblock %}
 
+{% block content %}
+
+{%include "cart.html" %}
 
 <a href="{% url product_list %}">Product list</a><br />
 <h1>Product list:</h1>
